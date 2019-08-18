@@ -8,4 +8,4 @@ if __name__ == "__main__":
 
     logging.basicConfig(filename=_config["log_file_name"], level=logging.INFO)
 
-    server.start(_config["host"], _config["port"], _config["port"])
+    server.start(_config["port"], _config["port"])

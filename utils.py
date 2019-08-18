@@ -14,13 +14,9 @@ def get_config() -> dict:
         try:
             with open('local_config.json') as file:
                 _data = load(file)
+                for key, val in _data.items():
+                    ans[key] = val
         except FileNotFoundError:
             pass
 
-        for key, val in _data.items():
-            ans[key] = val
-
     return ans
-
-
-print(get_config())

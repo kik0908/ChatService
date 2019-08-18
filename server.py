@@ -1,23 +1,50 @@
 from flask import Flask
 import flask
+import flask_restplus
 
-import TelegramClient
+# import TelegramClient
 
 app = Flask(__name__, template_folder='./app/templates')
 
+api = flask_restplus.Api(app, default='Default')
 
-@app.route('/')
-def hello_world():
-    return flask.render_template('index.html', dir=dir(flask.request.remote_addr), ip=flask.request.remote_addr)
+___chats = []
 
-
-@app.route('/send/<string:person>/<string:text>/')
-def send(person, text):
-    return flask.json.jsonify(**{'id': 45, 'person': person, 'message': text})
+ns = api.namespace('api', description='Operations related to blog categories')
 
 
-def start(host: str = None, port: int = None, debug: bool = None):
-    app.run(host=host, port=port, debug=debug)
+@ns.route('/chats/')
+class CategoryCollection(flask_restplus.Resource):
+    def get(self):
+        """Returns list of blog categories."""
+        return {}
+
+    @api.response(201, 'Category successfully created.')
+    def post(self):
+        """Creates a new blog category."""
+        return {}
+
+
+@ns.route('/<int:id>/')
+@api.response(404, 'Category not found.')
+class CategoryItem(flask_restplus.Resource):
+    def get(self, id):
+        """Returns details of a category."""
+        return {'id': id, 'dg': 'gh'}
+
+    @api.response(204, 'Category successfully updated.')
+    def put(self, id):
+        """Updates a blog category."""
+        return None, 204
+
+    @api.response(204, 'Category successfully deleted.')
+    def delete(self, id):
+        """Deletes blog category."""
+        return None, 204
+
+
+def start(port: int = None, debug: bool = None):
+    app.run(port=port, debug=debug)
 
 
 if __name__ == '__main__':

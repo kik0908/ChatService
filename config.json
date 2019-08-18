@@ -1,7 +1,6 @@
 {
   "debug": true,
   "port": 5000,
-  "host": "127.0.0.1",
   "api_id": 123456,
   "api_hash": "",
   "log_level_debug": true,
