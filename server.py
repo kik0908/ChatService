@@ -18,45 +18,59 @@ api = flask_restplus.Api(app)
 ___chats = []
 
 testModeleSendMes = api.model("Message", {'text': fields.String(min_length=1, max_length=200)})
-createChatModel = api.model("Create chat",
-                            {'title': fields.String(min_length=1, max_length=40, description="Название чата"),
-                             'users': fields.List(fields.String,
-                                                  description='Можно передать в строке логины или id участников строго в формате String')})
 
 ns = api.namespace('api/chats', description='Управление чатами')
 
-telegram_client: TelegramClient.TelegramAPI = TelegramClient.TelegramAPI(None)
+telegram_client = None
 
 
 @ns.route('/')
-class CategoryCollection(flask_restplus.Resource):
-    def get(self):  # доделать
-        """Возвращает все чаты"""
-        return {}
+class Chats(flask_restplus.Resource):
+    createChatModelReq = api.model("Create chat",
+                                   {'title': fields.String(min_length=1, max_length=40, description="Название чата"),
+                                    'users': fields.List(fields.String,
+                                                         description='Можно передать в строке логины или id участников строго в формате String')})
+    createChatModelAns = api.model("Create chat answer", {'chat_id': fields.Integer()})
 
     @api.response(201, 'Чат успешно создан')
-    @api.expect(createChatModel)
+    @api.expect(createChatModelReq)
+    @ns.marshal_with(createChatModelAns)
     @utils.error_handler
     def post(self):
+        """Создание чата"""
         global telegram_client
 
         data = request.json
-        telegram_client.create_chat(data['title'], data['users'])
+        ans = telegram_client.create_chat(data['title'], data['users'])
+        return {'chat_id': ans['id']}, 201
+
+
+@ns.route('/-<int:chat_id>/users/<string:user_id>/')
+class ChatsUsers(flask_restplus.Resource):
+    @api.response(201, "Пользователь добавлен")
+    def post(self, chat_id, user_id):
+        global telegram_client
+
+        telegram_client.add_members(0 - chat_id, user_id)
         return True, 201
 
 
-@ns.route('/<int:id>/')
-@api.response(404, 'Указанный id не найден')
-class CategoryItem(flask_restplus.Resource):
-    @api.response(200, "Информация возвращена успешно")
-    def get(self, id):  # доделать
-        """Возвращает детали о чате"""
-        return {'id': id}
+@ns.route('/-<int:chat_id>/message/')
+class ChatMessage(flask_restplus.Resource):
+    sendMessageInChatModelReq = api.model("Send message", {'text': fields.String(min_length=1, max_length=4096)})
+    sendMessageInChatModelAns = api.model("Send message ans",
+                                          {'chat_id': fields.Integer(), 'message_id': fields.Integer()})
 
-    @api.response(200, 'Чат удален успешно')
-    def delete(self, id):  # доделать
-        """Удаляет чат"""
-        return None
+    @api.response(201, "Сообщение отправлено")
+    @api.expect(sendMessageInChatModelReq)
+    @api.marshal_with(sendMessageInChatModelAns)
+    @utils.error_handler
+    def post(self, chat_id):
+        global telegram_client
+
+        data = request.json
+        ans = telegram_client.send_message(0 - chat_id, data['text'])
+        return {'chat_id': ans.chat.id, 'message_id': ans.message_id}, 201
 
 
 def start(port: int = None, debug: bool = None):
