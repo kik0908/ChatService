@@ -1,4 +1,5 @@
 from json import load, dump
+import logging
 
 
 def get_config() -> dict:
@@ -60,4 +61,12 @@ def get_chat_from_name(name: str):  # Если оставим, заюзать б
             return i
 
 
-add_chat_in_db({'df': 123, 'fd': [1, 23, 4]})
+def error_handler(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as E:
+            logging.error(str(E))
+            return str(E), 502
+
+    return wrapper
