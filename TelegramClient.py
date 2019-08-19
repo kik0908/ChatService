@@ -2,11 +2,6 @@ from pyrogram import Client, Filters
 from pyrogram.api.functions.messages.edit_chat_admin import EditChatAdmin
 
 
-api_id = "956114"
-api_hash = "fb3e9d5d801a823983d487640bcb8f55"
-
-lastChatID = None
-
 class TelegramAPI():
     def __init__(self, client):
         self.app = client
@@ -32,6 +27,11 @@ class TelegramAPI():
     def set_chat_title(self, chat_id, title):
         return self.app.set_chat_title(chat_id, title)
 
-with Client('session', api_id, api_hash) as client:
-    t = TelegramAPI(client)
-    print(t.create_chat())
+
+if __name__ == "__main__":
+    api_id = "956114"
+    api_hash = "fb3e9d5d801a823983d487640bcb8f55"
+
+    lastChatID = None
+    with Client('session', api_id, api_hash) as client:
+        t = TelegramAPI(client)
