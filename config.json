@@ -1,0 +1,9 @@
+{
+  "debug": true,
+  "port": 5000,
+  "api_id": 123456,
+  "api_hash": "",
+  "log_level_debug": true,
+  "log_file_name": "logs.log",
+  "use_local_config": true
+}
