@@ -23,45 +23,14 @@ def get_config() -> dict:
     return ans
 
 
-def add_chat_in_db(data: dict):
-    try:
-        with open('chats.json') as file:
-            ans = load(file)
-        ans['chats'].append(data)
-    except:
-        ans = {'chats': [data]}
+def error_handler_for_http_answer(func):
+    """
+    Декоратор обработки ошибок для функций ответа на запросы
+    Если в процессе выполнения потенциально опасного кода вызвался Exception, будет возвращено описание ошибки и код 502
+    :param func:
+    :return:
+    """
 
-    with open('chats.json', 'w') as file:
-        dump(ans, file)
-
-    return True
-
-
-def get_chats_from_db() -> list:  # Если оставим, адаптировать к бин поиску
-    try:
-        with open('chats.json') as file:
-            ans = load(file)
-    except:
-        ans = {'chats': []}
-
-    return ans['chats']
-
-
-def get_chat_from_id(id: int) -> dict:  # Если оставим, заюзать бин поиск
-    chats = get_chats_from_db()
-    for i in chats:
-        if i['id'] == id:
-            return i
-
-
-def get_chat_from_name(name: str):  # Если оставим, заюзать бин поиск
-    chats = get_chats_from_db()
-    for i in chats:
-        if i['title'] == name:
-            return i
-
-
-def error_handler(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -70,3 +39,7 @@ def error_handler(func):
             return str(E), 502
 
     return wrapper
+
+
+def banchmark():
+    pass
