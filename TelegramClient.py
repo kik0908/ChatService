@@ -1,22 +1,100 @@
-from pyrogram import Client, Filters, Chat
-from pyrogram.api.functions.messages.edit_chat_admin import EditChatAdmin
-from pyrogram.api.types import InputUser
-from pyrogram.api.types import InputUserEmpty, InputUserSelf, InputUser
-from pyrogram.api.functions.users import GetFullUser
-
+from pyrogram import Client
 
 class TelegramAPI():
     def __init__(self, client):
         self.app = client
 
+    def chat_premission(self, chat_id):
+        class chatPremission:
+            def __init__(
+                self,
+                send_message: bool = True,
+                send_media_messages: bool = True,
+                send_other_messages: bool = True,
+                add_web_page_previews: bool = True,
+                send_polls: bool = True,
+                change_info: bool = False,
+                invite_users: bool = False,
+                pin_messages: bool = False
+                ):
+                self.can_send_messages = send_message
+                self.can_send_media_messages = send_media_messages
+                self.can_send_other_messages = send_other_messages
+                self.can_add_web_page_previews = add_web_page_previews
+                self.can_send_polls = send_polls
+                self.can_change_info = change_info
+                self.can_invite_users = invite_users
+                self.can_pin_messages = pin_messages
+        return self.app.set_chat_permissions(chat_id, chatPremission())
+
+    def set_member(self, chat_id, users):
+        class memberPremission:
+            def __init__(
+                self,
+                change_info: bool = False,
+                invite_users: bool = False,
+                pin_messages: bool = False,
+                send_message: bool = True,
+                send_media_messages: bool = True,
+                send_other_messages: bool = True,
+                add_web_page_previews: bool = True,
+                send_polls: bool = True
+                ):
+                self.can_send_messages = send_message
+                self.can_send_media_messages = send_media_messages
+                self.can_send_other_messages = send_other_messages
+                self.can_add_web_page_previews = add_web_page_previews
+                self.can_send_polls = send_polls
+                self.can_change_info = change_info
+                self.can_invite_users = invite_users
+                self.can_pin_messages = pin_messages
+        if isinstance(users, str) == True:
+            users = [users]
+        for i in users:
+            self.app.restrict_chat_member(chat_id, i, memberPremission())
+        return True
+
+
+    def set_admin(self, chat_id, users):
+        class adminPremission:
+            def __init__(
+                    self,
+                    change_info: bool = True,
+                    invite_users: bool = True,
+                    pin_messages: bool = True,
+                    send_message: bool = True,
+                    send_media_messages: bool = True,
+                    send_other_messages: bool = True,
+                    add_web_page_previews: bool = True,
+                    send_polls: bool = True
+            ):
+                self.can_send_messages = send_message
+                self.can_send_media_messages = send_media_messages
+                self.can_send_other_messages = send_other_messages
+                self.can_add_web_page_previews = add_web_page_previews
+                self.can_send_polls = send_polls
+                self.can_change_info = change_info
+                self.can_invite_users = invite_users
+                self.can_pin_messages = pin_messages
+
+        if isinstance(users, str) == True:
+            users = [users]
+        for i in users:
+            self.app.restrict_chat_member(chat_id, i, adminPremission())
+        return True
+
+
     def send_message(self, id, message):
         return self.app.send_message(id, message)
 
     def create_chat(self, title, users):
-        return self.app.create_group(title, users)
+        chat_info = self.app.create_group(title, users)
+        return chat_info
 
     def add_members(self, chat_id, users):
-        return self.app.add_chat_members(chat_id, users)
+        self.app.add_chat_members(chat_id, users)
+        TelegramAPI().set_member(chat_id, users)
+        return True
 
     def kick_members(self, chat_id, user):
         return self.app.kick_chat_member(chat_id, user)
@@ -30,28 +108,13 @@ class TelegramAPI():
     def set_chat_title(self, chat_id, title):
         return self.app.set_chat_title(chat_id, title)
 
+    def add_admin(self, chat_id, user_id):
+        return self.app.add_chat_members(chat_id, user_id)
 
 if __name__ == "__main__":
-    api_id = "956114"
-    api_hash = "fb3e9d5d801a823983d487640bcb8f55"
+    api_id = "token"
+    api_hash = "token"
 
-    lastChatID = None
-    with Client('anon', api_id, api_hash) as client:
-        class A:
-            def __init__(self, id):
-                self.id = id
-
-            def write(self):
-                return bytes(self.id, encoding='utf-8')
-
-
-        print(client.get_users('zakhar123'))
-        # _ = InputUserSelf()
-        # print(_)
-        print(client.send(GetFullUser(id=InputUserSelf()))['user'])
-
-        client.send(EditChatAdmin(
-            chat_id=324493059,
-            user_id=InputUser(user_id=413679270, access_hash=client.send(GetFullUser(id=InputUserSelf()))['user']["access_hash"]*-1),
-            is_admin=True
-        ))
+    with Client('session', api_id, api_hash) as client:
+        t = TelegramAPI(client)
+        t.function(aruments)
