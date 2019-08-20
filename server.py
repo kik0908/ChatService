@@ -13,7 +13,7 @@ from time import time
 
 app = Flask(__name__, template_folder='./app/templates')
 
-api = flask_restplus.Api(app)
+api = flask_restplus.Api(app, doc='/ff/')
 
 ___chats = []
 
@@ -30,19 +30,19 @@ class Chats(flask_restplus.Resource):
                                    {'title': fields.String(min_length=1, max_length=40, description="Название чата"),
                                     'users': fields.List(fields.String,
                                                          description='Можно передать в строке логины или id участников строго в формате String')})
-    createChatModelAns = api.model("Create chat answer", {'chat_id': fields.Integer()})
+    createChatModelAns = api.model("Create chat answer", {'chat_id': fields.Integer(), 'title': fields.String()})
 
     @api.response(201, 'Чат успешно создан')
     @api.expect(createChatModelReq)
     @ns.marshal_with(createChatModelAns)
-    @utils.error_handler
+    @utils.error_handler_for_http_answer
     def post(self):
         """Создание чата"""
         global telegram_client
 
         data = request.json
         ans = telegram_client.create_chat(data['title'], data['users'])
-        return {'chat_id': ans['id']}, 201
+        return {'chat_id': ans['id'], 'title': data['title']}, 201
 
 
 @ns.route('/-<int:chat_id>/users/<string:user_id>/')
@@ -64,7 +64,7 @@ class ChatMessage(flask_restplus.Resource):
     @api.response(201, "Сообщение отправлено")
     @api.expect(sendMessageInChatModelReq)
     @api.marshal_with(sendMessageInChatModelAns)
-    @utils.error_handler
+    @utils.error_handler_for_http_answer
     def post(self, chat_id):
         global telegram_client
 
