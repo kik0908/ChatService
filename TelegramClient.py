@@ -27,16 +27,74 @@ class TelegramAPI():
                 self.can_pin_messages = pin_messages
         return self.app.set_chat_permissions(chat_id, chatPremission())
 
+    def set_member(self, chat_id, users):
+        class memberPremission:
+            def __init__(
+                self,
+                change_info: bool = False,
+                invite_users: bool = False,
+                pin_messages: bool = False,
+                send_message: bool = True,
+                send_media_messages: bool = True,
+                send_other_messages: bool = True,
+                add_web_page_previews: bool = True,
+                send_polls: bool = True
+                ):
+                self.can_send_messages = send_message
+                self.can_send_media_messages = send_media_messages
+                self.can_send_other_messages = send_other_messages
+                self.can_add_web_page_previews = add_web_page_previews
+                self.can_send_polls = send_polls
+                self.can_change_info = change_info
+                self.can_invite_users = invite_users
+                self.can_pin_messages = pin_messages
+        if isinstance(users, str) == True:
+            users = [users]
+        for i in users:
+            self.app.restrict_chat_member(chat_id, i, memberPremission())
+        return True
+
+
+    def set_admin(self, chat_id, users):
+        class adminPremission:
+            def __init__(
+                    self,
+                    change_info: bool = True,
+                    invite_users: bool = True,
+                    pin_messages: bool = True,
+                    send_message: bool = True,
+                    send_media_messages: bool = True,
+                    send_other_messages: bool = True,
+                    add_web_page_previews: bool = True,
+                    send_polls: bool = True
+            ):
+                self.can_send_messages = send_message
+                self.can_send_media_messages = send_media_messages
+                self.can_send_other_messages = send_other_messages
+                self.can_add_web_page_previews = add_web_page_previews
+                self.can_send_polls = send_polls
+                self.can_change_info = change_info
+                self.can_invite_users = invite_users
+                self.can_pin_messages = pin_messages
+
+        if isinstance(users, str) == True:
+            users = [users]
+        for i in users:
+            self.app.restrict_chat_member(chat_id, i, adminPremission())
+        return True
+
+
     def send_message(self, id, message):
         return self.app.send_message(id, message)
 
     def create_chat(self, title, users):
         chat_info = self.app.create_group(title, users)
-        t.chat_premission(chat_info['id'])
         return chat_info
 
     def add_members(self, chat_id, users):
-        return self.app.add_chat_members(chat_id, users)
+        self.app.add_chat_members(chat_id, users)
+        TelegramAPI().set_member(chat_id, users)
+        return True
 
     def kick_members(self, chat_id, user):
         return self.app.kick_chat_member(chat_id, user)
@@ -50,6 +108,8 @@ class TelegramAPI():
     def set_chat_title(self, chat_id, title):
         return self.app.set_chat_title(chat_id, title)
 
+    def add_admin(self, chat_id, user_id):
+        return self.app.add_chat_members(chat_id, user_id)
 
 if __name__ == "__main__":
     api_id = "token"
@@ -57,4 +117,4 @@ if __name__ == "__main__":
 
     with Client('session', api_id, api_hash) as client:
         t = TelegramAPI(client)
-        t.function()
+        t.function(aruments)
