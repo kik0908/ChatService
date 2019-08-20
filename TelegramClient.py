@@ -4,8 +4,8 @@ class TelegramAPI():
     def __init__(self, client):
         self.app = client
 
-    def chat_premission(self, chat_id):
-        class chatPremission:
+    def chat_permission(self, chat_id):
+        class chatPermission:
             def __init__(
                 self,
                 send_message: bool = True,
@@ -25,10 +25,10 @@ class TelegramAPI():
                 self.can_change_info = change_info
                 self.can_invite_users = invite_users
                 self.can_pin_messages = pin_messages
-        return self.app.set_chat_permissions(chat_id, chatPremission())
+        return self.app.set_chat_permissions(chat_id, chatPermission())
 
     def set_member(self, chat_id, users):
-        class memberPremission:
+        class memberPermission:
             def __init__(
                 self,
                 change_info: bool = False,
@@ -51,12 +51,12 @@ class TelegramAPI():
         if isinstance(users, str) == True:
             users = [users]
         for i in users:
-            self.app.restrict_chat_member(chat_id, i, memberPremission())
+            self.app.restrict_chat_member(chat_id, i, memberPermission())
         return True
 
 
     def set_admin(self, chat_id, users):
-        class adminPremission:
+        class adminPermission:
             def __init__(
                     self,
                     change_info: bool = True,
@@ -80,7 +80,7 @@ class TelegramAPI():
         if isinstance(users, str) == True:
             users = [users]
         for i in users:
-            self.app.restrict_chat_member(chat_id, i, adminPremission())
+            self.app.restrict_chat_member(chat_id, i, adminPermission())
         return True
 
 
@@ -93,7 +93,7 @@ class TelegramAPI():
 
     def add_members(self, chat_id, users):
         self.app.add_chat_members(chat_id, users)
-        TelegramAPI().set_member(chat_id, users)
+        TelegramAPI(self.app).set_member(chat_id, users)
         return True
 
     def kick_members(self, chat_id, user):
