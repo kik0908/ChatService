@@ -1,5 +1,6 @@
 from json import load, dump
 import logging
+from time import time
 
 
 def get_config() -> dict:
@@ -36,10 +37,26 @@ def error_handler_for_http_answer(func):
             return func(*args, **kwargs)
         except Exception as E:
             logging.error(str(E))
+            print("Error:", E)
             return str(E), 502
 
     return wrapper
 
 
-def banchmark():
-    pass
+def banchmark(iters=1, active=True):
+    def wrapper(func):
+        def wrapper2(*args, **kwargs):
+            if active is True:
+                total = 0
+                for i in range(iters):
+                    start = time()
+                    ans = func(*args, **kwargs)
+                    end = time()
+                    total += end - start
+                print('Среднее время выполнения функции:', total / iters)
+
+            return func(*args, **kwargs)
+
+        return wrapper2
+
+    return wrapper
