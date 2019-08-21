@@ -76,7 +76,7 @@ class ChatMessage(flask_restplus.Resource):
 
 
 @ns.route("/-<int:chat_id>/admins/<string:user_id>")
-class ChatAdmins:
+class ChatAdmins(flask_restplus.Resource):
     @api.response(201, "Админ добавлен")
     @utils.error_handler_for_http_answer
     def post(self, chat_id, user_id):
