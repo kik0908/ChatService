@@ -1,5 +1,4 @@
 from flask import Flask, request
-import flask
 import flask_restplus
 from flask_restplus import fields
 from pyrogram import Client
@@ -7,13 +6,9 @@ from pyrogram import Client
 import TelegramClient
 import utils
 
-from time import time
-
-# import TelegramClient
-
 app = Flask(__name__, template_folder='./app/templates')
 
-api = flask_restplus.Api(app, doc='/ff/')
+api = flask_restplus.Api(app)
 
 ___chats = []
 
@@ -48,8 +43,14 @@ class Chats(flask_restplus.Resource):
 @ns.route('/-<int:chat_id>/users/<string:user_id>/')
 class ChatsUsers(flask_restplus.Resource):
     @api.response(201, "Пользователь добавлен")
+    @utils.error_handler_for_http_answer
     def post(self, chat_id, user_id):
+        """Добавление пользователя в чат"""
         global telegram_client
+        try:
+            user_id = int(user_id)
+        except:
+            user_id = user_id
 
         telegram_client.add_members(0 - chat_id, user_id)
         return True, 201
@@ -66,11 +67,28 @@ class ChatMessage(flask_restplus.Resource):
     @api.marshal_with(sendMessageInChatModelAns)
     @utils.error_handler_for_http_answer
     def post(self, chat_id):
+        """Отправка сообщения"""
         global telegram_client
 
         data = request.json
         ans = telegram_client.send_message(0 - chat_id, data['text'])
         return {'chat_id': ans.chat.id, 'message_id': ans.message_id}, 201
+
+
+@ns.route("/-<int:chat_id>/admins/<string:user_id>")
+class ChatAdmins(flask_restplus.Resource):
+    @api.response(201, "Админ добавлен")
+    @utils.error_handler_for_http_answer
+    def post(self, chat_id, user_id):
+        """Добавление админ в чат"""
+        global telegram_client
+        try:
+            user_id = int(user_id)
+        except:
+            user_id = user_id
+
+        telegram_client.add_admin(0 - chat_id, user_id)
+        return True, 201
 
 
 def start(port: int = None, debug: bool = None):
