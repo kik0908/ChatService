@@ -23,7 +23,7 @@ class TelegramAPI:
                 self.can_change_info = change_info
                 self.can_invite_users = invite_users
                 self.can_pin_messages = pin_messages
-
+                
         return self.app.set_chat_permissions(chat_id, ChatPermission())
 
     def set_member(self, chat_id, users):
