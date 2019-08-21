@@ -43,7 +43,7 @@ class Chats(flask_restplus.Resource):
 @ns.route('/-<int:chat_id>/users/<string:user_id>/')
 class ChatsUsers(flask_restplus.Resource):
     @api.response(201, "Пользователь добавлен")
-    @utils.error_handler_for_http_answer
+    # @utils.error_handler_for_http_answer
     def post(self, chat_id, user_id):
         """Добавление пользователя в чат"""
         global telegram_client
@@ -52,8 +52,9 @@ class ChatsUsers(flask_restplus.Resource):
         except:
             user_id = user_id
 
-        telegram_client.add_members(0 - chat_id, user_id)
-        return True, 201
+        print(user_id, type(user_id))
+        ans = telegram_client.add_members(0 - chat_id, user_id)
+        return ans, 201
 
 
 @ns.route('/-<int:chat_id>/message/')
@@ -78,7 +79,7 @@ class ChatMessage(flask_restplus.Resource):
 @ns.route("/-<int:chat_id>/admins/<string:user_id>")
 class ChatAdmins(flask_restplus.Resource):
     @api.response(201, "Админ добавлен")
-    @utils.error_handler_for_http_answer
+    # @utils.error_handler_for_http_answer
     def post(self, chat_id, user_id):
         """Добавление админ в чат"""
         global telegram_client

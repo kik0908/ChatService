@@ -75,7 +75,6 @@ class TelegramAPI:
                 self.can_change_info = change_info
                 self.can_invite_users = invite_users
                 self.can_pin_messages = pin_messages
-
         if isinstance(users, str) is True:
             users = [users]
         for i in users:
@@ -87,7 +86,6 @@ class TelegramAPI:
 
     def create_chat(self, title, users):
         chat_info = self.app.create_group(title, users)
-        self.set_admin(chat_info['id'], users)
         return chat_info
 
     def add_members(self, chat_id, users):
